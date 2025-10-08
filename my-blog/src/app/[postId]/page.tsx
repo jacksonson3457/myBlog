@@ -41,8 +41,8 @@ export default async function BlogIdPage({ params }: Params) {
             borderRadius: 12,
           }}
         />
-        <p
-          className="mt-8 mb-40"
+        <div
+          className="prose prose-lg mt-8 mb-40 max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
         <Link href="/" prefetch={false}>

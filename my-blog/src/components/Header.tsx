@@ -4,7 +4,7 @@ export default function Header() {
   return (
     <header
       className="flex fixed top-0 w-full items-center 
-    justify-center p-4 bg-gray-800 text-white"
+    justify-center p-4 bg-gray-800 text-white z-10"
     >
       <h1 className="text-xl font-bold flex-1">Jackson Blog</h1>
       <nav className="space-x-4">
