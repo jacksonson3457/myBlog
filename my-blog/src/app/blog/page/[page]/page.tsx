@@ -1,5 +1,5 @@
-import { Content, getAllContents, getPageData } from "@/libs/client";
-import { DateChange } from "./utils/DateChange";
+import { client, Content, getAllContents, getPageData } from "@/libs/client";
+import { DateChange } from "../../../utils/DateChange";
 import { INITIAL_PER_PAGE } from "@/constants/Number";
 import { Pagination } from "@/components/Pagination";
 import Link from "next/link";
@@ -14,12 +14,24 @@ import {
   Container,
 } from "@mui/material";
 
-export default async function Home() {
-  const pageNumber = 1;
-  const PER_PAGE_LIMIT = INITIAL_PER_PAGE * pageNumber;
-  const PER_PAGE_OFFSET = PER_PAGE_LIMIT - INITIAL_PER_PAGE;
+// 各ページのpathを作成
+export const generateStaticParams = async () => {
+  const repos = await getAllContents();
+  const range = (start: number, end: number) =>
+    [...Array(end - start + 1)].map((_, i) => start + i);
+
+  //URLのパラメーターはstringで返す
+  return range(1, Math.ceil(repos.totalCount / INITIAL_PER_PAGE)).map(
+    (repo) => ({
+      page: repo.toString(),
+    })
+  );
+};
+
+export default async function Page({ params }: { params: { page: string } }) {
+  const page = Number(params.page);
   const data = await getPageData({
-    offset: PER_PAGE_OFFSET,
+    offset: (page - 1) * INITIAL_PER_PAGE,
     limit: INITIAL_PER_PAGE,
   });
   if (!data || !data.contents || data.contents.length === 0) {
@@ -65,7 +77,7 @@ export default async function Home() {
               >
                 <CardActionArea
                   component={Link}
-                  href={`/blog/${post.id}`}
+                  href={`/${post.id}`}
                   prefetch={false}
                   sx={{
                     height: "100%",
