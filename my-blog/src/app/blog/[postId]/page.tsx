@@ -6,12 +6,12 @@ import { notFound } from "next/navigation";
 
 type StaticParams = { postId: string }[];
 type Params = {
-  params: Promise<{ postId: string }>;
+  params: { postId: string };
 };
 
 export async function generateStaticParams(): Promise<StaticParams> {
   const data = await getAllContents();
-  const paths = data.map((post: { id: string }) => ({
+  const paths = data.contents.map((post: { id: string }) => ({
     postId: post.id,
   }));
   return paths;

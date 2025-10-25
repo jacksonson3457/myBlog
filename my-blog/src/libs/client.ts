@@ -1,3 +1,4 @@
+import { promises } from "dns";
 import { createClient, MicroCMSDate, MicroCMSQueries } from "microcms-js-sdk";
 
 export const client = createClient({
@@ -25,7 +26,7 @@ type ApiResponse = {
 };
 
 //全件取得
-export const getAllContents = async (): Promise<Content[]> => {
+export const getAllContents = async (): Promise<ApiResponse> => {
   const all: ApiResponse = await client.get({
     endpoint: "blogs",
     queries: {
@@ -33,7 +34,15 @@ export const getAllContents = async (): Promise<Content[]> => {
     },
   });
 
-  return all.contents;
+  return all;
+};
+
+// ページデータ取得
+export const getPageData = async (
+  queries?: MicroCMSQueries
+): Promise<ApiResponse> => {
+  const pageData = await client.get({ endpoint: "blogs", queries: queries });
+  return pageData;
 };
 
 // 詳細取得
