@@ -1,4 +1,4 @@
-import { Content, getAllContents, getPageData } from "@/libs/client";
+import { Content, getCategoryList, getPageData } from "@/libs/client";
 import { DateChange } from "./utils/DateChange";
 import { INITIAL_PER_PAGE } from "@/constants/Number";
 import { Pagination } from "@/components/Pagination";
@@ -13,6 +13,7 @@ import {
   Box,
   Container,
 } from "@mui/material";
+import CategoryTabs from "@/components/CategoryTabs";
 
 export default async function Home() {
   const pageNumber = 1;
@@ -27,14 +28,15 @@ export default async function Home() {
   }
   const listData = data.contents;
 
+  //categoryリストをmicroCMSから取得
+  const categoryList = await getCategoryList();
+
   return (
     <div
       className="flex flex-col w-full min-h-screen items-center pb-10"
       style={{ paddingTop: "80px" }}
     >
-      <Typography variant="h3" component="h1" className="font-bold mb-8">
-        ブログ一覧
-      </Typography>
+      <CategoryTabs current="all" categories={categoryList}></CategoryTabs>
       <Container maxWidth="lg">
         <Box
           sx={{

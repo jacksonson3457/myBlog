@@ -1,4 +1,3 @@
-import { promises } from "dns";
 import { createClient, MicroCMSDate, MicroCMSQueries } from "microcms-js-sdk";
 
 export const client = createClient({
@@ -24,6 +23,11 @@ type ApiResponse = {
   offset: number;
   limit: number;
 };
+
+export type Category = {
+  id: string;
+  name: string;
+} & MicroCMSDate;
 
 //全件取得
 export const getAllContents = async (): Promise<ApiResponse> => {
@@ -56,4 +60,31 @@ export const getContentDetail = async (
     queries: queries,
   });
   return detailData;
+};
+
+//カテゴリーリストを取得
+export const getCategoryList = async (): Promise<
+  (Category & { count: number })[]
+> => {
+  const categoryList = await client.get({ endpoint: "categories" });
+
+  // 各カテゴリに紐づく記事数を取得
+  const categoryWithCount = await Promise.all(
+    categoryList.contents.map(async (cat: Category) => {
+      const posts = await client.get({
+        endpoint: "blogs",
+        queries: {
+          filters: `category[equals]${cat.id}`, // ← ここがポイント！
+        },
+      });
+
+      return {
+        ...cat,
+        count: posts.totalCount, // microCMSは totalCount を返す
+      };
+    })
+  );
+
+  // 0件カテゴリを除外
+  return categoryWithCount.filter((c) => c.count > 0);
 };

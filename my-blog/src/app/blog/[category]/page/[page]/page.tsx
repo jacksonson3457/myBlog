@@ -1,5 +1,10 @@
-import { client, Content, getAllContents, getPageData } from "@/libs/client";
-import { DateChange } from "../../../utils/DateChange";
+import {
+  Content,
+  getAllContents,
+  getCategoryList,
+  getPageData,
+} from "@/libs/client";
+import { DateChange } from "../../../../utils/DateChange";
 import { INITIAL_PER_PAGE } from "@/constants/Number";
 import { Pagination } from "@/components/Pagination";
 import Link from "next/link";
@@ -13,27 +18,68 @@ import {
   Box,
   Container,
 } from "@mui/material";
+import { range } from "@/utils/range";
+import CategoryTabs from "@/components/CategoryTabs";
 
 // 各ページのpathを作成
 export const generateStaticParams = async () => {
   const repos = await getAllContents();
-  const range = (start: number, end: number) =>
-    [...Array(end - start + 1)].map((_, i) => start + i);
+  const totalCount = repos.totalCount;
 
-  //URLのパラメーターはstringで返す
-  return range(1, Math.ceil(repos.totalCount / INITIAL_PER_PAGE)).map(
-    (repo) => ({
-      page: repo.toString(),
-    })
-  );
+  //categoryリストをmicroCMSから取得
+  const categoryList = await getCategoryList();
+
+  // 「all」カテゴリを追加
+  const allCategories = [{ id: "all", name: "all" }, ...categoryList];
+
+  const paths: { category: string; page: string }[] = [];
+
+  //カテゴリー * ページ数分のパスを作成
+  // 例 { id: "a", name: "tech" }, ⇨ /blog/page/1?category=tech
+  allCategories.forEach((category) => {
+    range(1, totalCount).forEach((page) => {
+      paths.push({ category: category.name, page: page.toString() });
+    });
+  });
+
+  return paths;
 };
 
-export default async function Page({ params }: { params: { page: string } }) {
-  const page = Number(params.page);
-  const data = await getPageData({
-    offset: (page - 1) * INITIAL_PER_PAGE,
-    limit: INITIAL_PER_PAGE,
-  });
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ category: string; page: string }>;
+}) {
+  //pathのparamを取得
+  const { category, page } = await params;
+  const pageNumber = Number(page);
+
+  //category.name ⇨ category.id に変換（idをURLのパスにしない工夫）
+  const categoryList = await getCategoryList();
+  const categoryId =
+    category === "all"
+      ? undefined
+      : categoryList.find((c) => c.name === category)?.id;
+
+  const offset = (pageNumber - 1) * INITIAL_PER_PAGE;
+
+  // カテゴリ指定があるときだけ filters を追加
+  const query = categoryId
+    ? {
+        offset,
+        limit: INITIAL_PER_PAGE,
+        filters: `category[equals]${categoryId}`,
+        orders: "-publishedAt",
+      }
+    : {
+        offset,
+        limit: INITIAL_PER_PAGE,
+        orders: "-publishedAt",
+      };
+
+  //データ取得API実行
+  const data = await getPageData(query);
+
   if (!data || !data.contents || data.contents.length === 0) {
     return <div>ブログがありません</div>;
   }
@@ -44,9 +90,7 @@ export default async function Page({ params }: { params: { page: string } }) {
       className="flex flex-col w-full min-h-screen items-center pb-10"
       style={{ paddingTop: "80px" }}
     >
-      <Typography variant="h3" component="h1" className="font-bold mb-8">
-        ブログ一覧
-      </Typography>
+      <CategoryTabs current={category} categories={categoryList}></CategoryTabs>
       <Container maxWidth="lg">
         <Box
           sx={{
@@ -77,7 +121,7 @@ export default async function Page({ params }: { params: { page: string } }) {
               >
                 <CardActionArea
                   component={Link}
-                  href={`/${post.id}`}
+                  href={`/blog/post/${post.id}`}
                   prefetch={false}
                   sx={{
                     height: "100%",

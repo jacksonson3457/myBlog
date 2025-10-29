@@ -1,0 +1,51 @@
+myBlog/
+├── .git/
+├── amplify.yml
+├── README.md
+├── filetree.txt
+└── my-blog/
+    ├── .DS_Store
+    ├── .gitignore
+    ├── .next/
+    ├── eslint.config.mjs
+    ├── next.config.ts
+    ├── next-env.d.ts
+    ├── node_modules/
+    ├── out/
+    ├── package-lock.json
+    ├── package.json
+    ├── postcss.config.mjs
+    ├── public/
+    │   ├── images/
+    │   ├── file.svg
+    │   ├── globe.svg
+    │   ├── next.svg
+    │   ├── vercel.svg
+    │   └── window.svg
+    ├── README.md
+    ├── src/
+    │   ├── app/
+    │   │   ├── blog/
+    │   │   │   ├── [postId]/
+    │   │   │   │   └── page.tsx
+    │   │   │   └── page/
+    │   │   │       └── [page]/
+    │   │   │           └── page.tsx
+    │   │   ├── utils/
+    │   │   │   └── DateChange.tsx
+    │   │   ├── favicon.ico
+    │   │   ├── globals.css
+    │   │   ├── layout.tsx
+    │   │   ├── page.module.scss
+    │   │   └── page.tsx
+    │   ├── components/
+    │   │   ├── EmotionRegistry.tsx
+    │   │   ├── Footer.tsx
+    │   │   ├── Header.tsx
+    │   │   └── Pagination.tsx
+    │   ├── constants/
+    │   │   └── Number.tsx
+    │   ├── libs/
+    │   │   └── client.ts
+    │   └── utils/
+    └── tsconfig.json
