@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, Tab } from "@mui/material";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Category } from "@/libs/client";
 
 export default function CategoryTabs({
@@ -15,8 +15,7 @@ export default function CategoryTabs({
 
   // タブクリック時のルーティング
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
-    const path =
-      newValue === "all" ? "/blog/page/1" : `/blog/page/1?category=${newValue}`;
+    const path = (newValue = `/blog/${newValue}/page/1`);
     router.push(path);
   };
 

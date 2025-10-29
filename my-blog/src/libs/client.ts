@@ -1,4 +1,3 @@
-import { promises } from "dns";
 import { createClient, MicroCMSDate, MicroCMSQueries } from "microcms-js-sdk";
 
 export const client = createClient({

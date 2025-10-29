@@ -1,4 +1,3 @@
-import { INITIAL_PER_PAGE } from "@/constants/Number";
 import Link from "next/link";
 import { range } from "@/utils/range";
 

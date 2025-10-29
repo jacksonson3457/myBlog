@@ -1,12 +1,10 @@
 import {
-  client,
   Content,
-  Category,
   getAllContents,
   getCategoryList,
   getPageData,
 } from "@/libs/client";
-import { DateChange } from "../../../utils/DateChange";
+import { DateChange } from "../../../../utils/DateChange";
 import { INITIAL_PER_PAGE } from "@/constants/Number";
 import { Pagination } from "@/components/Pagination";
 import Link from "next/link";
@@ -31,19 +29,16 @@ export const generateStaticParams = async () => {
   //categoryリストをmicroCMSから取得
   const categoryList = await getCategoryList();
 
-  const paths: { page: string; category?: string }[] = [];
+  // 「all」カテゴリを追加
+  const allCategories = [{ id: "all", name: "all" }, ...categoryList];
 
-  //全件（categoryなし）
-  // 例 { page: "1" }, ⇨ /blog/page/1
-  range(1, totalCount).forEach((page) => {
-    paths.push({ page: page.toString() });
-  });
+  const paths: { category: string; page: string }[] = [];
 
   //カテゴリー * ページ数分のパスを作成
   // 例 { id: "a", name: "tech" }, ⇨ /blog/page/1?category=tech
-  categoryList.forEach((category) => {
+  allCategories.forEach((category) => {
     range(1, totalCount).forEach((page) => {
-      paths.push({ page: page.toString(), category: category.name });
+      paths.push({ category: category.name, page: page.toString() });
     });
   });
 
@@ -52,25 +47,19 @@ export const generateStaticParams = async () => {
 
 export default async function Page({
   params,
-  searchParams,
 }: {
-  params: { page: string };
-  searchParams: { category?: string };
+  params: Promise<{ category: string; page: string }>;
 }) {
-  const page = params.page;
-  const category = searchParams?.category;
-
+  //pathのparamを取得
+  const { category, page } = await params;
   const pageNumber = Number(page);
 
   //category.name ⇨ category.id に変換（idをURLのパスにしない工夫）
-  let categoryId: string | undefined;
   const categoryList = await getCategoryList();
-  if (category) {
-    const categoryObj = categoryList.find(
-      (cat: Category) => cat.name === category
-    );
-    categoryId = categoryObj?.id;
-  }
+  const categoryId =
+    category === "all"
+      ? undefined
+      : categoryList.find((c) => c.name === category)?.id;
 
   const offset = (pageNumber - 1) * INITIAL_PER_PAGE;
 
@@ -132,7 +121,7 @@ export default async function Page({
               >
                 <CardActionArea
                   component={Link}
-                  href={`/blog/${post.id}`}
+                  href={`/blog/post/${post.id}`}
                   prefetch={false}
                   sx={{
                     height: "100%",
