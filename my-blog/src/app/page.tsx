@@ -67,7 +67,7 @@ export default async function Home() {
               >
                 <CardActionArea
                   component={Link}
-                  href={`/blog/${post.id}`}
+                  href={`/blog/post/${post.id}`}
                   prefetch={false}
                   sx={{
                     height: "100%",
