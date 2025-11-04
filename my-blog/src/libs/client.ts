@@ -15,6 +15,9 @@ export type Content = {
     width: number;
     height: number;
   };
+  category: Category;
+  author: string;
+  evaluation: number;
 } & MicroCMSDate;
 
 type ApiResponse = {

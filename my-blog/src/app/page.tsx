@@ -14,6 +14,7 @@ import {
   Container,
 } from "@mui/material";
 import CategoryTabs from "@/components/CategoryTabs";
+import BlogCard from "@/components/BlogCard";
 
 export default async function Home() {
   const pageNumber = 1;
@@ -37,7 +38,26 @@ export default async function Home() {
       style={{ paddingTop: "80px" }}
     >
       <CategoryTabs current="all" categories={categoryList}></CategoryTabs>
-      <Container maxWidth="lg">
+      {/* allの場合 */}
+      <Box
+        sx={{
+          border: "1px solid #e0e0e0", // 枠線
+          borderRadius: 2, // 角を少し丸く
+          p: 4, // 内側の余白
+          mb: 8, // 下の余白
+          boxShadow: "0 2px 8px rgba(0,0,0,0.04)", // ほんのり影（オプション）
+        }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            textAlign: "center",
+            mb: 3,
+            fontWeight: 600,
+          }}
+        >
+          最新の投稿
+        </Typography>
         <Box
           sx={{
             display: "grid",
@@ -50,88 +70,54 @@ export default async function Home() {
             mb: 12,
           }}
         >
-          {listData.map((post: Content) => {
-            return (
-              <Card
-                key={post.id}
-                sx={{
-                  height: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  transition: "all 0.3s ease-in-out",
-                  "&:hover": {
-                    transform: "translateY(-8px)",
-                    boxShadow: 6,
-                  },
-                }}
-              >
-                <CardActionArea
-                  component={Link}
-                  href={`/blog/post/${post.id}`}
-                  prefetch={false}
-                  sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    position: "relative",
-                    overflow: "hidden",
-                    "&:hover": {
-                      "&::before": {
-                        content: '""',
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: "rgba(255, 255, 255, 0.15)",
-                        pointerEvents: "none",
-                        zIndex: 1,
-                      },
-                    },
-                  }}
-                >
-                  <CardMedia
-                    component="div"
-                    sx={{
-                      width: "100%",
-                      height: 200,
-                      position: "relative",
-                    }}
-                  >
-                    <ExportedImage
-                      src={post.thumbnail.url}
-                      alt="blogimage"
-                      fill
-                      style={{
-                        objectFit: "cover",
-                      }}
-                    />
-                  </CardMedia>
-                  <CardContent sx={{ flexGrow: 1, width: "100%" }}>
-                    <DateChange date={post.publishedAt!} />
-                    <Typography
-                      variant="h6"
-                      component="h2"
-                      sx={{
-                        mt: 2,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                      }}
-                    >
-                      {post.title}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            );
-          })}
+          {listData.slice(0, 3).map((post: Content) => (
+            <BlogCard key={post.id} post={post} />
+          ))}
         </Box>
-      </Container>
-      <Pagination totalCount={data.totalCount} />
+      </Box>
+      {/* カテゴリー別の場合 */}
+      {categoryList.map((cat) => (
+        <Box
+          key={cat.id}
+          sx={{
+            border: "1px solid #e0e0e0", // 枠線
+            borderRadius: 2, // 角を少し丸く
+            p: 4, // 内側の余白
+            mb: 8, // 下の余白
+            boxShadow: "0 2px 8px rgba(0,0,0,0.04)", // ほんのり影（オプション）
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              textAlign: "center",
+              mb: 3,
+              fontWeight: 600,
+            }}
+          >
+            {cat.name}
+          </Typography>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: {
+                xs: "1fr",
+                md: "repeat(2, 1fr)",
+                lg: "repeat(3, 1fr)",
+              },
+              gap: 3,
+              mb: 12,
+            }}
+          >
+            {listData
+              .filter((p) => p.category.id === cat.id)
+              .slice(0, 3)
+              .map((post: Content) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+          </Box>
+        </Box>
+      ))}
     </div>
   );
 }
