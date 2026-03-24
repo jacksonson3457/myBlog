@@ -70,7 +70,11 @@ export default async function Home() {
         </div>
       ))}
       <div className="content-wrap">
-        <Pagination totalCount={data.totalCount} currentPage={1} category="all" />
+        <Pagination
+          totalCount={data.totalCount}
+          currentPage={1}
+          category="all"
+        />
       </div>
     </div>
   );
