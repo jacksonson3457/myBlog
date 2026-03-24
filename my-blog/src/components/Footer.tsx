@@ -1,8 +1,9 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-gray-100 text-sm py-6 px-4">
-      <div className="max-w-screen-lg mx-auto flex flex-col sm:flex-row sm:justify-between space-y-4 sm:space-y-0">
-        <p className="text-sm mt-4 sm:mt-0">© 2025 Jackson Blog</p>
+    <footer className="border-t border-white/10 bg-black/40 px-4 py-8 text-sm text-stone-300">
+      <div className="content-wrap flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="tracking-[0.12em] text-stone-400">© 2026 JACKSON BLOG</p>
+        <p className="text-xs text-stone-500">Quiet notes for people who build.</p>
       </div>
     </footer>
   );
