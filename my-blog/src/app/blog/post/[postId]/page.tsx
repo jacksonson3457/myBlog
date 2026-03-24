@@ -38,6 +38,7 @@ export default async function BlogIdPage({ params }: Params) {
           placeholder="empty"
           width={1000}
           height={560}
+          sizes="(max-width: 840px) 92vw, 820px"
           style={{
             width: "100%",
             maxHeight: 420,
