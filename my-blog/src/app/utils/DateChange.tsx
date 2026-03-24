@@ -8,5 +8,5 @@ export const DateChange = ({ date }: DateChangeProps) => {
   const formatedDate = `${dateObj.getFullYear()}/${
     dateObj.getMonth() + 1
   }/${dateObj.getDate()}`;
-  return <p className="text-xs">{formatedDate}</p>;
+  return <p className="lux-date">{formatedDate}</p>;
 };

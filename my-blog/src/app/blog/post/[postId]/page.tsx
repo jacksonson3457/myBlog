@@ -25,30 +25,39 @@ export default async function BlogIdPage({ params }: Params) {
   }
 
   return (
-    <div className="flex flex-col w-full pb-16 min-h-screen items-center">
-      <div className="flex flex-col w-full sm:max-w-[700px] px-5 pt-40 pb-20">
-        <h1 className="text-3xl border-b border-black pb-2">{post.title}</h1>
+    <div className="page-shell pb-16">
+      <article className="content-wrap section-panel max-w-[820px]">
+        <h1 className="mb-3 border-b border-white/15 pb-4 text-3xl font-semibold leading-tight text-stone-100">
+          {post.title}
+        </h1>
         <DateChange date={post.publishedAt!} />
-        <div className="mb-10" />
+        <div className="mb-8" />
         <ExportedImage
           src={post.thumbnail?.url || "/placeholder.jpg"}
           alt="blogimage"
           placeholder="empty"
-          width={300}
-          height={300}
+          width={1000}
+          height={560}
           style={{
-            objectFit: "contain",
-            borderRadius: 12,
+            width: "100%",
+            maxHeight: 420,
+            objectFit: "cover",
+            borderRadius: 14,
+            border: "1px solid rgba(255,255,255,0.12)",
           }}
         />
         <div
-          className="prose prose-lg mt-8 mb-40 max-w-none"
+          className="prose prose-lg mt-8 mb-14 max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
-        <Link href="/" prefetch={false}>
-          <p>＜ 一覧へ</p>
+        <Link
+          href="/"
+          prefetch={false}
+          className="inline-flex rounded-full border border-white/20 px-5 py-2 text-sm text-stone-300 hover:border-stone-300 hover:text-stone-100"
+        >
+          ＜ 一覧へ
         </Link>
-      </div>
+      </article>
     </div>
   );
 }

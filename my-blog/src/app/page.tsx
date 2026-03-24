@@ -1,18 +1,7 @@
 import { Content, getCategoryList, getPageData } from "@/libs/client";
-import { DateChange } from "./utils/DateChange";
 import { INITIAL_PER_PAGE } from "@/constants/Number";
 import { Pagination } from "@/components/Pagination";
-import Link from "next/link";
-import ExportedImage from "next-image-export-optimizer";
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Typography,
-  Box,
-  Container,
-} from "@mui/material";
+import { Box } from "@mui/material";
 import CategoryTabs from "@/components/CategoryTabs";
 import BlogCard from "@/components/BlogCard";
 
@@ -33,31 +22,13 @@ export default async function Home() {
   const categoryList = await getCategoryList();
 
   return (
-    <div
-      className="flex flex-col w-full min-h-screen items-center pb-10"
-      style={{ paddingTop: "80px" }}
-    >
-      <CategoryTabs current="all" categories={categoryList}></CategoryTabs>
+    <div className="page-shell">
+      <div className="content-wrap">
+        <CategoryTabs current="all" categories={categoryList}></CategoryTabs>
+      </div>
       {/* allの場合 */}
-      <Box
-        sx={{
-          border: "1px solid #e0e0e0", // 枠線
-          borderRadius: 2, // 角を少し丸く
-          p: 4, // 内側の余白
-          mb: 8, // 下の余白
-          boxShadow: "0 2px 8px rgba(0,0,0,0.04)", // ほんのり影（オプション）
-        }}
-      >
-        <Typography
-          variant="h5"
-          sx={{
-            textAlign: "center",
-            mb: 3,
-            fontWeight: 600,
-          }}
-        >
-          最新の投稿
-        </Typography>
+      <div className="content-wrap section-panel mb-8">
+        <h2 className="section-heading">最新の投稿</h2>
         <Box
           sx={{
             display: "grid",
@@ -67,36 +38,17 @@ export default async function Home() {
               lg: "repeat(3, 1fr)",
             },
             gap: 3,
-            mb: 12,
           }}
         >
           {listData.slice(0, 3).map((post: Content) => (
             <BlogCard key={post.id} post={post} />
           ))}
         </Box>
-      </Box>
+      </div>
       {/* カテゴリー別の場合 */}
       {categoryList.map((cat) => (
-        <Box
-          key={cat.id}
-          sx={{
-            border: "1px solid #e0e0e0", // 枠線
-            borderRadius: 2, // 角を少し丸く
-            p: 4, // 内側の余白
-            mb: 8, // 下の余白
-            boxShadow: "0 2px 8px rgba(0,0,0,0.04)", // ほんのり影（オプション）
-          }}
-        >
-          <Typography
-            variant="h5"
-            sx={{
-              textAlign: "center",
-              mb: 3,
-              fontWeight: 600,
-            }}
-          >
-            {cat.name}
-          </Typography>
+        <div key={cat.id} className="content-wrap section-panel mb-8">
+          <h2 className="section-heading">{cat.name}</h2>
           <Box
             sx={{
               display: "grid",
@@ -106,7 +58,6 @@ export default async function Home() {
                 lg: "repeat(3, 1fr)",
               },
               gap: 3,
-              mb: 12,
             }}
           >
             {listData
@@ -116,8 +67,11 @@ export default async function Home() {
                 <BlogCard key={post.id} post={post} />
               ))}
           </Box>
-        </Box>
+        </div>
       ))}
+      <div className="content-wrap">
+        <Pagination totalCount={data.totalCount} currentPage={1} category="all" />
+      </div>
     </div>
   );
 }

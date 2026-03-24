@@ -15,7 +15,7 @@ export default function CategoryTabs({
 
   // タブクリック時のルーティング
   const handleChange = (_: React.SyntheticEvent, newValue: string) => {
-    const path = (newValue = `/blog/${newValue}/page/1`);
+    const path = `/blog/${newValue}/page/1`;
     router.push(path);
   };
 
@@ -25,15 +25,22 @@ export default function CategoryTabs({
       onChange={handleChange}
       variant="scrollable"
       scrollButtons="auto"
-      indicatorColor="primary"
+      indicatorColor="secondary"
       textColor="inherit"
       sx={{
-        borderBottom: 1,
-        borderColor: "divider",
+        width: "100%",
+        border: "1px solid rgba(255,255,255,0.14)",
+        borderRadius: "999px",
+        minHeight: "56px",
+        px: 1,
         mb: 4,
-        // 背景をテーマに応じて切り替え
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark" ? "background.paper" : "grey.100",
+        bgcolor: "rgba(255,255,255,0.04)",
+        "& .MuiTabs-indicator": {
+          height: "100%",
+          borderRadius: "999px",
+          backgroundColor: "rgba(233, 217, 181, 0.18)",
+          zIndex: 0,
+        },
       }}
     >
       <Tab
@@ -41,13 +48,12 @@ export default function CategoryTabs({
         value="all"
         sx={{
           textTransform: "none",
-          fontWeight: !current ? "bold" : "normal",
-          color: (theme) =>
-            theme.palette.mode === "dark"
-              ? theme.palette.grey[200]
-              : theme.palette.text.primary,
+          fontWeight: !current || current === "all" ? "bold" : "normal",
+          color: "rgba(255,255,255,0.74)",
+          minHeight: "44px",
+          zIndex: 1,
           "&.Mui-selected": {
-            color: (theme) => theme.palette.primary.main,
+            color: "#f6ebd4",
           },
         }}
       />
@@ -58,13 +64,12 @@ export default function CategoryTabs({
           value={cat.name}
           sx={{
             textTransform: "none",
-            fontWeight: current === cat.id ? "bold" : "normal",
-            color: (theme) =>
-              theme.palette.mode === "dark"
-                ? theme.palette.grey[400]
-                : theme.palette.text.secondary,
+            fontWeight: current === cat.name ? "bold" : "normal",
+            color: "rgba(255,255,255,0.6)",
+            minHeight: "44px",
+            zIndex: 1,
             "&.Mui-selected": {
-              color: (theme) => theme.palette.primary.main,
+              color: "#f6ebd4",
             },
           }}
         />

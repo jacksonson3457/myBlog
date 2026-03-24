@@ -3,19 +3,18 @@ import Link from "next/link";
 export default function Header() {
   return (
     <header
-      className="flex fixed top-0 w-full items-center 
-    justify-center p-4 bg-gray-800 text-white z-10"
+      className="fixed top-0 z-20 w-full border-b border-white/10 bg-black/60 backdrop-blur-xl"
     >
-      <h1 className="text-xl font-bold flex-1">Jackson Blog</h1>
-      <nav className="space-x-4">
-        <Link href="/" className="hover:underline">
-          Home
-        </Link>
-
-        {/* <Link href="/1" className="hover:underline">
-          Blog
-        </Link> */}
-      </nav>
+      <div className="content-wrap flex items-center justify-between px-1 py-4">
+        <h1 className="text-lg font-semibold tracking-[0.18em] text-stone-100 sm:text-xl">
+          JACKSON BLOG
+        </h1>
+        <nav className="space-x-5 text-sm text-stone-300">
+          <Link href="/" className="hover:text-stone-100">
+            Home
+          </Link>
+        </nav>
+      </div>
     </header>
   );
 }
