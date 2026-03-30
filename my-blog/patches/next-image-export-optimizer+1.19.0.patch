@@ -1,0 +1,77 @@
+diff --git a/node_modules/next-image-export-optimizer/dist/ExportedImage.js b/node_modules/next-image-export-optimizer/dist/ExportedImage.js
+index 7e87bfb..5a5e829 100644
+--- a/node_modules/next-image-export-optimizer/dist/ExportedImage.js
++++ b/node_modules/next-image-export-optimizer/dist/ExportedImage.js
+@@ -78,11 +78,8 @@ const hashAlgorithm = (str, seed = 0) => {
+ };
+ function urlToFilename(url) {
+     try {
+-        const parsedUrl = new URL(url);
+-        const extension = parsedUrl.pathname.split(".").pop();
+-        if (extension) {
+-            return hashAlgorithm(url).toString().concat(".", extension);
+-        }
++        new URL(url);
++        return hashAlgorithm(url).toString();
+     }
+     catch (error) {
+         console.error("Error parsing URL", url, error);
+@@ -91,7 +88,7 @@ function urlToFilename(url) {
+ }
+ const imageURLForRemoteImage = ({ src, width, basePath, }) => {
+     const encodedSrc = urlToFilename(src);
+-    return generateImageURL(encodedSrc, width, basePath, true);
++    return generateImageURL(`${encodedSrc}.jpg`, width, basePath, true);
+ };
+ const optimizedLoader = ({ src, width, basePath, }) => {
+     const isStaticImage = typeof src === "object";
+diff --git a/node_modules/next-image-export-optimizer/dist/legacy/ExportedImage.js b/node_modules/next-image-export-optimizer/dist/legacy/ExportedImage.js
+index fbebbc0..682f028 100644
+--- a/node_modules/next-image-export-optimizer/dist/legacy/ExportedImage.js
++++ b/node_modules/next-image-export-optimizer/dist/legacy/ExportedImage.js
+@@ -66,11 +66,8 @@ const hashAlgorithm = (str, seed = 0) => {
+ };
+ function urlToFilename(url) {
+     try {
+-        const parsedUrl = new URL(url);
+-        const extension = parsedUrl.pathname.split(".").pop();
+-        if (extension) {
+-            return hashAlgorithm(url).toString().concat(".", extension);
+-        }
++        new URL(url);
++        return hashAlgorithm(url).toString();
+     }
+     catch (error) {
+         console.error("Error parsing URL", url, error);
+@@ -79,7 +76,7 @@ function urlToFilename(url) {
+ }
+ const imageURLForRemoteImage = ({ src, width, basePath, }) => {
+     const encodedSrc = urlToFilename(src);
+-    return generateImageURL(encodedSrc, width, basePath, true);
++    return generateImageURL(`${encodedSrc}.jpg`, width, basePath, true);
+ };
+ const optimizedLoader = ({ src, width, basePath, }) => {
+     const isStaticImage = typeof src === "object";
+diff --git a/node_modules/next-image-export-optimizer/dist/utils/urlToFilename.js b/node_modules/next-image-export-optimizer/dist/utils/urlToFilename.js
+index c3d304c..97a6e82 100644
+--- a/node_modules/next-image-export-optimizer/dist/utils/urlToFilename.js
++++ b/node_modules/next-image-export-optimizer/dist/utils/urlToFilename.js
+@@ -1,16 +1,13 @@
+ "use strict";
+ module.exports = function urlToFilename(url) {
+     try {
+-        const parsedUrl = new URL(url);
+-        const extension = parsedUrl.pathname.split(".").pop();
+-        if (extension) {
+-            return hashAlgorithm(url).toString().concat(".", extension);
+-        }
++        new URL(url);
+         return hashAlgorithm(url).toString();
+     }
+     catch (error) {
+         console.error("Error parsing URL", url, error);
+     }
++    return hashAlgorithm(url).toString();
+ };
+ // Credits to https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
+ // This is a hash function that is used to generate a hash from the image URL

@@ -24,6 +24,8 @@ export default function BlogCard({
   height = 160,
   width = "100%",
 }: BlogCardProps) {
+  const isDev = process.env.NODE_ENV !== "production";
+
   return (
     <Card
       key={post.id}
@@ -62,6 +64,8 @@ export default function BlogCard({
           <ExportedImage
             src={post.thumbnail.url}
             alt={post.title}
+            placeholder="empty"
+            unoptimized={isDev}
             fill
             sizes="(max-width: 768px) 92vw, (max-width: 1200px) 48vw, 32vw"
             style={{
