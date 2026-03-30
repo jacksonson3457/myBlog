@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
     nextImageExportOptimizer_quality: "70",
     nextImageExportOptimizer_storePicturesInWEBP: "true",
     nextImageExportOptimizer_exportFolderName: "nextImageExportOptimizer",
+    nextImageExportOptimizer_generateAndUseBlurImages: "false",
   },
 };
 

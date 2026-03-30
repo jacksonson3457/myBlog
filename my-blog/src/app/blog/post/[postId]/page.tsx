@@ -20,6 +20,8 @@ export async function generateStaticParams(): Promise<StaticParams> {
 export default async function BlogIdPage({ params }: Params) {
   const { postId } = await params;
   const post = await getContentDetail(postId);
+  const isDev = process.env.NODE_ENV !== "production";
+
   if (!post) {
     return notFound();
   }
@@ -36,6 +38,7 @@ export default async function BlogIdPage({ params }: Params) {
           src={post.thumbnail?.url || "/placeholder.jpg"}
           alt="blogimage"
           placeholder="empty"
+          unoptimized={isDev}
           width={1000}
           height={560}
           sizes="(max-width: 840px) 92vw, 820px"
