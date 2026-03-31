@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { range } from "@/utils/range";
-import { INITIAL_PER_PAGE } from "@/constants/Number";
 
 type PaginationProps = {
   totalCount: number;
@@ -15,11 +14,10 @@ export const Pagination = ({
   category,
 }: PaginationProps) => {
   const hrefBase = category ? `/blog/${category}/page` : "/blog/all/page";
-  const totalPages = Math.max(1, Math.ceil(totalCount / INITIAL_PER_PAGE));
 
   return (
     <ul className="pagination">
-      {range(1, totalPages).map((number, index) => {
+      {range(1, totalCount).map((number, index) => {
         return (
           <li key={index}>
             <Link

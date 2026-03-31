@@ -9,6 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
     "postinstall": "patch-package"
   },
   "dependencies": {
@@ -29,6 +31,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@playwright/test": "^1.51.1",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
     "patch-package": "^8.0.1",
