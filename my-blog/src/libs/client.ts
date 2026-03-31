@@ -38,6 +38,7 @@ export const getAllContents = async (): Promise<ApiResponse> => {
     endpoint: "blogs",
     queries: {
       orders: "-publishedAt",
+      limit: 100,
     },
   });
 
