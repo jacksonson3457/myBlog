@@ -15,7 +15,6 @@ import BlogCard from "@/components/BlogCard";
 export const generateStaticParams = async () => {
   const repos = await getAllContents();
   const totalCount = repos.totalCount;
-  const totalPages = Math.max(1, Math.ceil(totalCount / INITIAL_PER_PAGE));
 
   //categoryリストをmicroCMSから取得
   const categoryList = await getCategoryList();
@@ -28,7 +27,7 @@ export const generateStaticParams = async () => {
   //カテゴリー * ページ数分のパスを作成
   // 例 { id: "a", name: "tech" }, ⇨ /blog/page/1?category=tech
   allCategories.forEach((category) => {
-    range(1, totalPages).forEach((page) => {
+    range(1, totalCount).forEach((page) => {
       paths.push({ category: category.name, page: page.toString() });
     });
   });

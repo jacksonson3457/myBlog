@@ -1,4 +1,5 @@
 import { createClient, MicroCMSDate, MicroCMSQueries } from "microcms-js-sdk";
+import { E2E_CATEGORIES, E2E_CONTENTS } from "@/libs/e2eMockData";
 
 export const client = createClient({
   serviceDomain: process.env.MICROCMS_SERVICE_DOMAIN || "",
@@ -32,8 +33,46 @@ export type Category = {
   name: string;
 } & MicroCMSDate;
 
+const useE2EMock = process.env.E2E_MOCK === "true";
+
+const sortByPublishedAtDesc = (contents: Content[]) =>
+  [...contents].sort((a, b) => {
+    return new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
+  });
+
+const filterContentsByQuery = (contents: Content[], queries?: MicroCMSQueries) => {
+  let filtered = sortByPublishedAtDesc(contents);
+
+  const filters = queries?.filters;
+  if (filters) {
+    const categoryEquals = filters.match(/^category\[equals\](.+)$/);
+    if (categoryEquals?.[1]) {
+      const categoryId = categoryEquals[1];
+      filtered = filtered.filter((content) => content.category.id === categoryId);
+    }
+  }
+
+  const offset = queries?.offset ?? 0;
+  const limit = queries?.limit ?? filtered.length;
+  return {
+    totalCount: filtered.length,
+    contents: filtered.slice(offset, offset + limit),
+    offset,
+    limit,
+  };
+};
+
 //全件取得
 export const getAllContents = async (): Promise<ApiResponse> => {
+  if (useE2EMock) {
+    return {
+      contents: sortByPublishedAtDesc(E2E_CONTENTS).slice(0, 100),
+      totalCount: E2E_CONTENTS.length,
+      offset: 0,
+      limit: 100,
+    };
+  }
+
   const all: ApiResponse = await client.get({
     endpoint: "blogs",
     queries: {
@@ -49,6 +88,10 @@ export const getAllContents = async (): Promise<ApiResponse> => {
 export const getPageData = async (
   queries?: MicroCMSQueries
 ): Promise<ApiResponse> => {
+  if (useE2EMock) {
+    return filterContentsByQuery(E2E_CONTENTS, queries);
+  }
+
   const pageData = await client.get({ endpoint: "blogs", queries: queries });
   return pageData;
 };
@@ -58,6 +101,14 @@ export const getContentDetail = async (
   id: string,
   queries?: MicroCMSQueries
 ): Promise<Content> => {
+  if (useE2EMock) {
+    const post = E2E_CONTENTS.find((content) => content.id === id);
+    if (!post) {
+      throw new Error(`Content not found: ${id}`);
+    }
+    return post;
+  }
+
   const detailData = await client.getListDetail<Content>({
     endpoint: "blogs",
     contentId: id,
@@ -70,6 +121,13 @@ export const getContentDetail = async (
 export const getCategoryList = async (): Promise<
   (Category & { count: number })[]
 > => {
+  if (useE2EMock) {
+    return E2E_CATEGORIES.map((category) => ({
+      ...category,
+      count: E2E_CONTENTS.filter((content) => content.category.id === category.id).length,
+    })).filter((category) => category.count > 0);
+  }
+
   const categoryList = await client.get({ endpoint: "categories" });
 
   // 各カテゴリに紐づく記事数を取得
