@@ -33,6 +33,8 @@ export type Category = {
   name: string;
 } & MicroCMSDate;
 
+type CategoryWithCount = Category & { count: number };
+
 const useE2EMock = process.env.E2E_MOCK === "true";
 
 const sortByPublishedAtDesc = (contents: Content[]) =>
@@ -62,91 +64,95 @@ const filterContentsByQuery = (contents: Content[], queries?: MicroCMSQueries) =
   };
 };
 
-//全件取得
-export const getAllContents = async (): Promise<ApiResponse> => {
-  if (useE2EMock) {
-    return {
-      contents: sortByPublishedAtDesc(E2E_CONTENTS).slice(0, 100),
-      totalCount: E2E_CONTENTS.length,
-      offset: 0,
-      limit: 100,
-    };
-  }
-
-  const all: ApiResponse = await client.get({
-    endpoint: "blogs",
-    queries: {
-      orders: "-publishedAt",
-      limit: 100,
-    },
-  });
-
-  return all;
+type ContentRepository = {
+  getAllContents: () => Promise<ApiResponse>;
+  getPageData: (queries?: MicroCMSQueries) => Promise<ApiResponse>;
+  getContentDetail: (id: string, queries?: MicroCMSQueries) => Promise<Content>;
+  getCategoryList: () => Promise<CategoryWithCount[]>;
 };
 
-// ページデータ取得
-export const getPageData = async (
-  queries?: MicroCMSQueries
-): Promise<ApiResponse> => {
-  if (useE2EMock) {
-    return filterContentsByQuery(E2E_CONTENTS, queries);
-  }
-
-  const pageData = await client.get({ endpoint: "blogs", queries: queries });
-  return pageData;
-};
-
-// 詳細取得
-export const getContentDetail = async (
-  id: string,
-  queries?: MicroCMSQueries
-): Promise<Content> => {
-  if (useE2EMock) {
+const createE2ERepository = (): ContentRepository => ({
+  getAllContents: async () => ({
+    contents: sortByPublishedAtDesc(E2E_CONTENTS).slice(0, 100),
+    totalCount: E2E_CONTENTS.length,
+    offset: 0,
+    limit: 100,
+  }),
+  getPageData: async (queries?: MicroCMSQueries) =>
+    filterContentsByQuery(E2E_CONTENTS, queries),
+  getContentDetail: async (id: string) => {
     const post = E2E_CONTENTS.find((content) => content.id === id);
     if (!post) {
       throw new Error(`Content not found: ${id}`);
     }
     return post;
-  }
+  },
+  getCategoryList: async () =>
+    E2E_CATEGORIES.map((category) => ({
+      ...category,
+      count: E2E_CONTENTS.filter((content) => content.category.id === category.id)
+        .length,
+    })).filter((category) => category.count > 0),
+});
 
-  const detailData = await client.getListDetail<Content>({
-    endpoint: "blogs",
-    contentId: id,
-    queries: queries,
-  });
-  return detailData;
-};
+const createMicroCMSRepository = (): ContentRepository => ({
+  getAllContents: async () =>
+    client.get({
+      endpoint: "blogs",
+      queries: {
+        orders: "-publishedAt",
+        limit: 100,
+      },
+    }),
+  getPageData: async (queries?: MicroCMSQueries) =>
+    client.get({ endpoint: "blogs", queries: queries }),
+  getContentDetail: async (id: string, queries?: MicroCMSQueries) =>
+    client.getListDetail<Content>({
+      endpoint: "blogs",
+      contentId: id,
+      queries: queries,
+    }),
+  getCategoryList: async () => {
+    const categoryList = await client.get({ endpoint: "categories" });
+
+    // 各カテゴリに紐づく記事数を取得
+    const categoryWithCount = await Promise.all(
+      categoryList.contents.map(async (cat: Category) => {
+        const posts = await client.get({
+          endpoint: "blogs",
+          queries: {
+            filters: `category[equals]${cat.id}`,
+          },
+        });
+
+        return {
+          ...cat,
+          count: posts.totalCount,
+        };
+      })
+    );
+
+    // 0件カテゴリを除外
+    return categoryWithCount.filter((c) => c.count > 0);
+  },
+});
+
+const repository = useE2EMock ? createE2ERepository() : createMicroCMSRepository();
+
+//全件取得
+export const getAllContents = async (): Promise<ApiResponse> =>
+  repository.getAllContents();
+
+// ページデータ取得
+export const getPageData = async (queries?: MicroCMSQueries): Promise<ApiResponse> =>
+  repository.getPageData(queries);
+
+// 詳細取得
+export const getContentDetail = async (
+  id: string,
+  queries?: MicroCMSQueries
+): Promise<Content> => repository.getContentDetail(id, queries);
 
 //カテゴリーリストを取得
-export const getCategoryList = async (): Promise<
-  (Category & { count: number })[]
-> => {
-  if (useE2EMock) {
-    return E2E_CATEGORIES.map((category) => ({
-      ...category,
-      count: E2E_CONTENTS.filter((content) => content.category.id === category.id).length,
-    })).filter((category) => category.count > 0);
-  }
-
-  const categoryList = await client.get({ endpoint: "categories" });
-
-  // 各カテゴリに紐づく記事数を取得
-  const categoryWithCount = await Promise.all(
-    categoryList.contents.map(async (cat: Category) => {
-      const posts = await client.get({
-        endpoint: "blogs",
-        queries: {
-          filters: `category[equals]${cat.id}`, // ← ここがポイント！
-        },
-      });
-
-      return {
-        ...cat,
-        count: posts.totalCount, // microCMSは totalCount を返す
-      };
-    })
-  );
-
-  // 0件カテゴリを除外
-  return categoryWithCount.filter((c) => c.count > 0);
-};
+export const getCategoryList = async (): Promise<CategoryWithCount[]> =>
+  repository.getCategoryList();
