@@ -20,19 +20,31 @@ const diaryCategory: Category = {
   revisedAt: now,
 };
 
-export const E2E_CATEGORIES: Category[] = [techCategory, diaryCategory];
+const apexCategory: Category = {
+  id: "cat-apex",
+  name: "APEX",
+  createdAt: now,
+  updatedAt: now,
+  publishedAt: now,
+  revisedAt: now,
+};
+
+export const E2E_CATEGORIES: Category[] = [techCategory, diaryCategory, apexCategory];
 
 export const E2E_CONTENTS: Content[] = Array.from({ length: 12 }).map(
   (_, index) => {
     const number = index + 1;
+    const isApex = number === 12;
     const isTech = number % 2 === 1;
-    const category = isTech ? techCategory : diaryCategory;
+    const category = isApex ? apexCategory : isTech ? techCategory : diaryCategory;
     const suffix = String(number).padStart(2, "0");
 
     return {
       id: `post-${suffix}`,
-      title: `${category.name} モック記事 ${suffix}`,
+      title: isApex ? `APEX キルクリップ ${suffix}` : `${category.name} モック記事 ${suffix}`,
       content: `<p>${category.name} の本文 ${suffix}</p>`,
+      contentType: isApex ? "video" : "article",
+      youtubeUrl: isApex ? "https://www.youtube.com/watch?v=dQw4w9WgXcQ" : undefined,
       thumbnail: {
         url: "/next.svg",
         width: 512,

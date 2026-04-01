@@ -1,5 +1,7 @@
 import { DateChange } from "@/app/utils/DateChange";
 import { getAllContents, getContentDetail } from "@/libs/client";
+import { isVideoContent } from "@/utils/contentType";
+import { buildDetailStaticParams } from "@/utils/postStaticParams";
 import ExportedImage from "next-image-export-optimizer";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -11,10 +13,7 @@ type Params = {
 
 export async function generateStaticParams(): Promise<StaticParams> {
   const data = await getAllContents();
-  const paths = data.contents.map((post: { id: string }) => ({
-    postId: post.id,
-  }));
-  return paths;
+  return buildDetailStaticParams(data.contents);
 }
 
 export default async function BlogIdPage({ params }: Params) {
@@ -23,6 +22,10 @@ export default async function BlogIdPage({ params }: Params) {
   const isDev = process.env.NODE_ENV !== "production";
 
   if (!post) {
+    return notFound();
+  }
+
+  if (isVideoContent(post.contentType, post.youtubeUrl)) {
     return notFound();
   }
 
