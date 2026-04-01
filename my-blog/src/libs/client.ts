@@ -11,7 +11,9 @@ export type Content = {
   id: string;
   title: string;
   content: string;
-  thumbnail: {
+  contentType?: "article" | "video" | string[];
+  youtubeUrl?: string;
+  thumbnail?: {
     url: string;
     width: number;
     height: number;
