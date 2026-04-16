@@ -39,13 +39,21 @@ type CategoryWithCount = Category & { count: number };
 
 const useE2EMock = process.env.E2E_MOCK === "true";
 
-const sortByPublishedAtDesc = (contents: Content[]) =>
+const sortByPublishedAt = (contents: Content[], order: "asc" | "desc" = "desc") =>
   [...contents].sort((a, b) => {
-    return new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
+    const diff =
+      new Date(b.publishedAt ?? 0).getTime() - new Date(a.publishedAt ?? 0).getTime();
+    return order === "desc" ? diff : -diff;
   });
 
 const filterContentsByQuery = (contents: Content[], queries?: MicroCMSQueries) => {
-  let filtered = sortByPublishedAtDesc(contents);
+  let filtered = [...contents];
+
+  if (queries?.orders === "-publishedAt") {
+    filtered = sortByPublishedAt(filtered, "desc");
+  } else if (queries?.orders === "publishedAt") {
+    filtered = sortByPublishedAt(filtered, "asc");
+  }
 
   const filters = queries?.filters;
   if (filters) {
@@ -75,7 +83,8 @@ type ContentRepository = {
 
 const createE2ERepository = (): ContentRepository => ({
   getAllContents: async () => ({
-    contents: sortByPublishedAtDesc(E2E_CONTENTS).slice(0, 100),
+    // production getAllContents uses orders: "-publishedAt"
+    contents: sortByPublishedAt(E2E_CONTENTS, "desc").slice(0, 100),
     totalCount: E2E_CONTENTS.length,
     offset: 0,
     limit: 100,

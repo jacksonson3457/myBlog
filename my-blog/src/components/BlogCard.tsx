@@ -11,7 +11,7 @@ import {
   Box,
 } from "@mui/material";
 import { Content } from "@/libs/client";
-import { DateChange } from "@/app/utils/DateChange";
+import { DateChange } from "@/components/DateChange";
 import { isVideoContent } from "@/utils/contentType";
 import { toYouTubeEmbedUrl } from "@/utils/youtube";
 

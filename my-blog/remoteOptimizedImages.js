@@ -4,6 +4,7 @@ const apiKey = process.env.MICROCMS_API_KEY || "";
 const LIMIT = 100;
 
 async function fetchBlogs(offset = 0) {
+  // URLSearchParamsはグローバルクラス
   const query = new URLSearchParams({
     orders: "-publishedAt",
     limit: String(LIMIT),
