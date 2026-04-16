@@ -1,4 +1,4 @@
-import { DateChange } from "@/app/utils/DateChange";
+import { DateChange } from "@/components/DateChange";
 import { getAllContents, getContentDetail } from "@/libs/client";
 import { isVideoContent } from "@/utils/contentType";
 import { buildDetailStaticParams } from "@/utils/postStaticParams";
